@@ -13,7 +13,9 @@ GLFWwindow* window;
 
 // Include GLM
 #include <glm/glm.hpp>
+#include<glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 using namespace glm;
 
 // Our premade functions
@@ -34,13 +36,32 @@ double lastTime;
 std::vector<Obj3D> objects;
 
 void createObjects() {
+	const float pi_over_2 = half_pi<float>();
+	
+	objects.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture2.dds"));
+	objects.rbegin()->rotation.y = three_over_two_pi<float>();
+	objects.rbegin()->scale = vec3(20.0f);
+	objects.rbegin()->position.z = -20.0f;
+	objects.rbegin()->depthTest = false;
+	objects.rbegin()->init();
+
+	objects.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture.dds"));
+	objects.rbegin()->rotation.y = pi_over_2;
+	objects.rbegin()->scale = vec3(20.0f);
+	objects.rbegin()->depthTest = false;
+	objects.rbegin()->init();
+
+
 	for (int i = 0; i <= 10; ++i) {
 		objects.push_back(Obj3D("models/rock/model1.obj", "models/rock/texture.dds"));
-		objects[i].init();
+		objects.rbegin()->init();
 
-		objects[i].position = vec3(rand() % 6, rand() % 6, rand() % 6);	
-		objects[i].speed = vec3(rand() % 100 / 10000.f, rand() % 100 / 10000.f, rand() % 100 / 10000.f);
+		objects.rbegin()->position = vec3(rand() % 6, rand() % 6, rand() % 6);	
+		objects.rbegin()->speed = vec3(rand() % 100 / 10000.f, rand() % 100 / 10000.f, rand() % 100 / 10000.f);
 	}
+
+	objects.push_back(Obj3D("models/house1/model1.obj", "models/house1/texture.dds"));
+	objects.rbegin()->init();
 }
 
 void updateLoop() {
@@ -82,8 +103,18 @@ void drawLoop(GLuint programID, vec3 lightPos) {
 	for (std::vector<Obj3D>::iterator obj  = objects.begin(); obj != objects.end(); ++obj) {
 		
 		// Set the position of our model
-		glm::mat4 ModelMatrix = translate(mat4(1.0f), obj->position);
-		glm::mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		mat4 ScaledModel = scale(obj->scale);
+		mat4 XRotatedModel = rotate(ScaledModel, obj->rotation.x, vec3(0.0f, 1.0f, 0.0f));
+		mat4 XYRotatedModel = rotate(XRotatedModel, obj->rotation.y, vec3(-1.0f, 0.0f, 0.0f));
+		mat4 ModelMatrix = translate(XYRotatedModel, obj->position);
+		mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+
+		if (obj->depthTest) {
+			glDepthMask(GL_TRUE);
+		}
+		else {
+			glDepthMask(GL_FALSE);
+		}
 
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
@@ -95,17 +126,17 @@ void drawLoop(GLuint programID, vec3 lightPos) {
 
 		// Vertices
 		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, obj->VBO);
+		glBindBuffer(GL_ARRAY_BUFFER, obj->model->VBO);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
 		// UVs
 		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, obj->UVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, obj->model->UVBO);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
 		// Normals
 		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, obj->NBO);
+		glBindBuffer(GL_ARRAY_BUFFER, obj->model->NBO);
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
 		glDrawArrays(GL_TRIANGLES, 0, obj->model->vertices.size());
@@ -121,7 +152,7 @@ void drawLoop(GLuint programID, vec3 lightPos) {
 
 }
 
-std::map<std::string, Model> Obj3D::modelCache;
+std::map<std::string, Model*> Obj3D::modelCache;
 std::map<std::string, GLuint> Obj3D::textureCache;
 
 int main(void)
@@ -175,7 +206,6 @@ int main(void)
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
 
-
 	// Compile our shaders
 	GLuint programID = LoadShaders("light.vertexshader", "light.fragmentshader");
 
@@ -185,7 +215,7 @@ int main(void)
 	LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
 	TextureID = glGetUniformLocation(programID, "myTextureSampler");
 
-	vec3 lightPos(50, 50, 50);
+	vec3 lightPos(-25, 50, 25);
 
 	createObjects();
 	

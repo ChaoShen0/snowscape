@@ -1,0 +1,16 @@
+# Blender MTL File: 'City_House_2_BI.blend'
+# Material Count: 1
+
+newmtl city_house_2
+Ns 96.078431
+Ka 1.000000 1.000000 1.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.385621 0.328723 0.236590
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd textures\Nor_2.jpg
+map_Bump -bm 0.050000 city_house_2_Col.jpg
+map_Ks  city_house_2_Spec.jpg
+refl -s 0.200000 0.200000 1.000000 city_house_2_Col.jpg

@@ -14,19 +14,23 @@ struct Model {
 	std::vector <vec3> vertices;
 	std::vector <vec2> UVs;
 	std::vector <vec3> normals;
+	GLuint VertexArrayID, VBO, UVBO, NBO;
+
+	~Model() {
+		printf("Model destructor called \n");
+	}
 };
 
 class Obj3D {
 	public:
-		static std::map<std::string, Model> modelCache;
+		static std::map<std::string, Model*> modelCache;
 		static std::map<std::string, GLuint> textureCache;
 
 		Model *model;
-
 		GLuint Texture;
-		GLuint VertexArrayID, VBO, UVBO, NBO;
 		char *modelPath, *texturePath;
-		vec3 position, speed;
+		vec3 position, speed, rotation, scale;
+		bool depthTest;
 
 		Obj3D(char * modelPath, char * texturePath);
 		~Obj3D();
