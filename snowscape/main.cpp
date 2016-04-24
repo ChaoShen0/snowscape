@@ -38,29 +38,28 @@ std::vector<Obj3D> objects;
 void createObjects() {
 	const float pi_over_2 = half_pi<float>();
 	
-	objects.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture2.dds"));
+	objects.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture2.dds", "models/skybox/texture_normals.bmp"));
 	objects.rbegin()->rotation.y = three_over_two_pi<float>();
-	objects.rbegin()->scale = vec3(20.0f);
+	objects.rbegin()->scale = vec3(10.0f);
 	objects.rbegin()->position.z = -20.0f;
 	objects.rbegin()->depthTest = false;
 	objects.rbegin()->init();
 
-	objects.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture.dds"));
+	objects.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture.dds", "models/skybox/texture_normals.bmp"));
 	objects.rbegin()->rotation.y = pi_over_2;
-	objects.rbegin()->scale = vec3(20.0f);
+	objects.rbegin()->scale = vec3(10.0f);
 	objects.rbegin()->depthTest = false;
 	objects.rbegin()->init();
-
-
-	for (int i = 0; i <= 2; ++i) {
-		objects.push_back(Obj3D("models/rock/model1.obj", "models/rock/texture.dds"));
+	
+	for (int i = 0; i <= 10; ++i) {
+		objects.push_back(Obj3D("models/rock/model1.obj", "models/rock/texture.dds", "models/rock/texture_normals.bmp"));
 		objects.rbegin()->init();
 
-		objects.rbegin()->position = vec3(rand() % 6, rand() % 6, rand() % 6);	
+		objects.rbegin()->position = vec3(rand() % 10, rand() % 10, rand() % 10);	
 		objects.rbegin()->speed = vec3(rand() % 100 / 10000.f, rand() % 100 / 10000.f, rand() % 100 / 10000.f);
 	}
 
-	objects.push_back(Obj3D("models/house1/model1.obj", "models/house1/texture.dds"));
+	objects.push_back(Obj3D("models/house1/model1.obj", "models/house1/texture.dds", "models/house1/texture_normals.bmp"));
 	objects.rbegin()->init();
 }
 
@@ -71,7 +70,7 @@ void updateLoop() {
 }
 
 // Shader uniform identifiers
-GLuint MatrixID, ViewMatrixID, ModelMatrixID, LightID, TextureID;
+GLuint MatrixID, ViewMatrixID, ModelMatrixID, LightID, TextureID, NormalTextureID, ModelView3x3MatrixID;
 
 void drawLoop(GLuint programID, vec3 lightPos) {
 	// Measure speed
@@ -107,7 +106,9 @@ void drawLoop(GLuint programID, vec3 lightPos) {
 		mat4 XRotatedModel = rotate(ScaledModel, obj->rotation.x, vec3(0.0f, 1.0f, 0.0f));
 		mat4 XYRotatedModel = rotate(XRotatedModel, obj->rotation.y, vec3(-1.0f, 0.0f, 0.0f));
 		mat4 ModelMatrix = translate(XYRotatedModel, obj->position);
-		mat4 MVP = ProjectionMatrix * ViewMatrix * ModelMatrix;
+		mat4 ModelViewMatrix = ViewMatrix * ModelMatrix;
+		mat3 ModelView3x3Matrix = mat3(ModelViewMatrix);
+		mat4 MVP = ProjectionMatrix * ModelViewMatrix;
 
 		if (obj->depthTest) {
 			glDepthMask(GL_TRUE);
@@ -118,12 +119,18 @@ void drawLoop(GLuint programID, vec3 lightPos) {
 
 		glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 		glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &ModelMatrix[0][0]);
+		glUniformMatrix3fv(ModelView3x3MatrixID, 1, GL_FALSE, &ModelView3x3Matrix[0][0]);
 
 		// Bind our texture
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, obj->Texture);
 		glUniform1i(TextureID, 0);
 
+		// Texture normals
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, obj->NormalTexture);
+		glUniform1i(NormalTextureID, 1);
+		
 		// Vertices
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, obj->model->VBO);
@@ -138,6 +145,16 @@ void drawLoop(GLuint programID, vec3 lightPos) {
 		glEnableVertexAttribArray(2);
 		glBindBuffer(GL_ARRAY_BUFFER, obj->model->NBO);
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+
+		// Tangents
+		glEnableVertexAttribArray(3);
+		glBindBuffer(GL_ARRAY_BUFFER, obj->model->tangentbuffer);
+		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+
+		// Bitangents
+		glEnableVertexAttribArray(4);
+		glBindBuffer(GL_ARRAY_BUFFER, obj->model->bitangentbuffer);
+		glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->model->elementbuffer);
 
@@ -219,6 +236,8 @@ int main(void)
 	ModelMatrixID = glGetUniformLocation(programID, "M");
 	LightID = glGetUniformLocation(programID, "LightPosition_worldspace");
 	TextureID = glGetUniformLocation(programID, "myTextureSampler");
+	NormalTextureID = glGetUniformLocation(programID, "normalTextureSampler");
+	ModelView3x3MatrixID = glGetUniformLocation(programID, "MV3x3");
 
 	vec3 lightPos(-25, 50, 25);
 
@@ -230,6 +249,15 @@ int main(void)
 
 	do {
 		updateLoop();
+		/*
+		lightPos.y += 0.1f;
+		if (lightPos.y > 30.0f) lightPos.y = 10.0f;
+
+		lightPos.x += 0.15f;
+		if (lightPos.x > 20.0f) lightPos.x = -20.0f;
+		*/
+		objects[3].position = lightPos;
+
 		drawLoop(programID, lightPos);
 	}
 	while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
@@ -237,6 +265,7 @@ int main(void)
 
 	glDeleteProgram(programID);
 	glDeleteTextures(1, &TextureID);
+	glDeleteTextures(1, &NormalTextureID);
 	
 	// Delete all objects
 	objects.clear();

@@ -66,8 +66,7 @@ void computeTangentBasis(
 		}
 
 	}
-
-
+	
 }
 
 
