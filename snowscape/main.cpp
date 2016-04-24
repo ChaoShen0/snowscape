@@ -41,14 +41,14 @@ void createObjects() {
 
 	objects_shader1.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture2.dds"));
 	objects_shader1.rbegin()->rotation.y = three_over_two_pi<float>();
-	objects_shader1.rbegin()->scale = vec3(10.0f);
+	objects_shader1.rbegin()->scale = vec3(5.0f);
 	objects_shader1.rbegin()->position.z = -20.0f;
 	objects_shader1.rbegin()->depthTest = false;
 	objects_shader1.rbegin()->init();
 
 	objects_shader1.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture.dds"));
 	objects_shader1.rbegin()->rotation.y = pi_over_2;
-	objects_shader1.rbegin()->scale = vec3(10.0f);
+	objects_shader1.rbegin()->scale = vec3(5.0f);
 	objects_shader1.rbegin()->depthTest = false;
 	objects_shader1.rbegin()->init();
 	
@@ -256,6 +256,7 @@ int main(void)
 
 	// Vsync on
 	glfwSwapInterval(1);
+
 	// Set the mouse at the center of the screen
 	glfwPollEvents();
 	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT/ 2);
