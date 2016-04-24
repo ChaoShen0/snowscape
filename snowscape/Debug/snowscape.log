@@ -1,0 +1,25 @@
+﻿Build started 4/24/2016 6:07:53 PM.
+     1>Project "C:\Users\XCS\documents\visual studio 2015\Projects\snowscape\snowscape\snowscape.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         G:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /I"C:\Users\XCS\documents\visual studio 2015\Projects\snowscape\common/" /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CRT_SECURE_NO_WARNINGS /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Obj3D.cpp main.cpp
+         Obj3D.cpp
+         Generating Code...
+         Skipping... (no relevant changes detected)
+         main.cpp
+       Link:
+         G:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\XCS\documents\visual studio 2015\Projects\snowscape\Debug\snowscape.exe" /INCREMENTAL /NOLOGO opengl32.lib glew32.lib glew32s.lib glfw3.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\XCS\documents\visual studio 2015\Projects\snowscape\Debug\snowscape.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\XCS\documents\visual studio 2015\Projects\snowscape\Debug\snowscape.lib" /MACHINE:X86 Debug\controls.obj
+         Debug\objloader.obj
+         Debug\quaternion_utils.obj
+         Debug\shader.obj
+         Debug\tangentspace.obj
+         Debug\text2D.obj
+         Debug\texture.obj
+         Debug\vboindexer.obj
+         Debug\main.obj
+         Debug\Obj3D.obj
+         snowscape.vcxproj -> C:\Users\XCS\documents\visual studio 2015\Projects\snowscape\Debug\snowscape.exe
+     1>Done Building Project "C:\Users\XCS\documents\visual studio 2015\Projects\snowscape\snowscape\snowscape.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.11
