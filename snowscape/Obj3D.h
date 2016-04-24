@@ -47,6 +47,7 @@ class Obj3D {
 		~Obj3D();
 		void init();
 		void update();
+		mat4 getModelMatrix();
 };
 
 #endif
