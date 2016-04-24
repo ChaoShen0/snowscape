@@ -254,6 +254,8 @@ int main(void)
 	// Hide the mouse and enable unlimited mouvement
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+	// Vsync on
+	glfwSwapInterval(1);
 	// Set the mouse at the center of the screen
 	glfwPollEvents();
 	glfwSetCursorPos(window, WINDOW_WIDTH / 2, WINDOW_HEIGHT/ 2);
