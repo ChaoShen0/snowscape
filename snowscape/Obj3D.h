@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OBJ3D_H
+#define OBJ3D_H
 
 #include <vector>
 #include <map>
@@ -14,7 +15,13 @@ struct Model {
 	std::vector <vec3> vertices;
 	std::vector <vec2> UVs;
 	std::vector <vec3> normals;
-	GLuint VertexArrayID, VBO, UVBO, NBO;
+
+	std::vector<unsigned short> indices;
+	std::vector<glm::vec3> indexed_vertices;
+	std::vector<glm::vec2> indexed_UVs;
+	std::vector<glm::vec3> indexed_normals;
+
+	GLuint VertexArrayID, VBO, UVBO, NBO, elementbuffer;
 
 	~Model() {
 		printf("Model destructor called \n");
@@ -38,3 +45,4 @@ class Obj3D {
 		void update();
 };
 
+#endif

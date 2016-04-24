@@ -111,10 +111,9 @@ void indexVBO(
 
 	// For each input vertex
 	for ( unsigned int i=0; i<in_vertices.size(); i++ ){
-
+		
 		PackedVertex packed = {in_vertices[i], in_uvs[i], in_normals[i]};
 		
-
 		// Try to find a similar vertex in out_XXXX
 		unsigned short index;
 		bool found = getSimilarVertexIndex_fast( packed, VertexToOutIndex, index);
@@ -131,12 +130,6 @@ void indexVBO(
 		}
 	}
 }
-
-
-
-
-
-
 
 void indexVBO_TBN(
 	std::vector<glm::vec3> & in_vertices,

@@ -52,7 +52,7 @@ void createObjects() {
 	objects.rbegin()->init();
 
 
-	for (int i = 0; i <= 10; ++i) {
+	for (int i = 0; i <= 2; ++i) {
 		objects.push_back(Obj3D("models/rock/model1.obj", "models/rock/texture.dds"));
 		objects.rbegin()->init();
 
@@ -139,7 +139,9 @@ void drawLoop(GLuint programID, vec3 lightPos) {
 		glBindBuffer(GL_ARRAY_BUFFER, obj->model->NBO);
 		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
 
-		glDrawArrays(GL_TRIANGLES, 0, obj->model->vertices.size());
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, obj->model->elementbuffer);
+
+		glDrawElements(GL_TRIANGLES, obj->model->indices.size(), GL_UNSIGNED_SHORT, (void*)0);
 
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
@@ -205,6 +207,9 @@ int main(void)
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glEnable(GL_CULL_FACE);
+
+	// Wireframe mode
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// Compile our shaders
 	GLuint programID = LoadShaders("light.vertexshader", "light.fragmentshader");
