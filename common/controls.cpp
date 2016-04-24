@@ -99,8 +99,8 @@ void computeMatricesFromInputs(){
 	ProjectionMatrix = glm::perspective(FoV, 4.0f / 3.0f, 0.1f, 1000.0f);
 	
 	// Limit camera vertical movement
-	if (position.y > 2) position.y = 2;
-	if (position.y < 0.5f) position.y = 0.5f;
+	if (position.y > 3.5f) position.y = 3.5f;
+	if (position.y < 2) position.y = 2;
 
 
 	// Camera matrix

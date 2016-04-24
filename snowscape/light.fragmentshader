@@ -24,13 +24,13 @@ void main(){
 
 	// Light emission properties
 	// You probably want to put them as uniforms
-	vec3 LightColor = vec3(1,1,1);
-	float LightPower = 5000.0f;
+	vec3 LightColor = vec3(1,1,0.9);
+	float LightPower = 2500.0f;
 	
 	// Material properties
 	vec3 MaterialDiffuseColor = texture( myTextureSampler, UV ).rgb;
-	vec3 MaterialAmbientColor = vec3(0.1,0.1,0.1) * MaterialDiffuseColor;
-	vec3 MaterialSpecularColor = vec3(0.3,0.3,0.3) * MaterialDiffuseColor;
+	vec3 MaterialAmbientColor = vec3(0.3,0.3,0.3) * MaterialDiffuseColor;
+	vec3 MaterialSpecularColor = vec3(0.5,0.5,0.5) * MaterialDiffuseColor;
 
 	// Local normal, in tangent space. V tex coordinate is inverted because normal map is in TGA (not in DDS) for better quality
 	vec3 TextureNormal_tangentspace = normalize(texture( normalTextureSampler, vec2(UV.x,-UV.y) ).rgb*2.0 - 1.0);

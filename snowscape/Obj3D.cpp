@@ -93,10 +93,10 @@ void Obj3D::init() {
 }
 
 mat4 Obj3D::getModelMatrix() {
-	mat4 ScaledModel = glm::scale(scale);
-	mat4 XRotatedModel = glm::rotate(ScaledModel, rotation.x, vec3(0.0f, 1.0f, 0.0f));
+	mat4 TranslatedMatrix = glm::translate(position);
+	mat4 XRotatedModel = glm::rotate(TranslatedMatrix, rotation.x, vec3(0.0f, 1.0f, 0.0f));
 	mat4 XYRotatedModel = glm::rotate(XRotatedModel, rotation.y, vec3(-1.0f, 0.0f, 0.0f));
-	mat4 ModelMatrix = glm::translate(XYRotatedModel, position);
+	mat4 ModelMatrix = glm::scale(XYRotatedModel, scale);
 
 	return ModelMatrix;
 }

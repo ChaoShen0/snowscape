@@ -38,30 +38,70 @@ std::vector<Obj3D> objects_shader1;
 
 void createObjects() {
 	const float pi_over_2 = half_pi<float>();
+	const float pi_over_4 = quarter_pi<float>();
 
+	// Skybox
 	objects_shader1.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture2.dds"));
 	objects_shader1.rbegin()->rotation.y = three_over_two_pi<float>();
-	objects_shader1.rbegin()->scale = vec3(5.0f);
-	objects_shader1.rbegin()->position.z = -20.0f;
-	objects_shader1.rbegin()->depthTest = false;
+	objects_shader1.rbegin()->scale = vec3(12.0f);
+	objects_shader1.rbegin()->position.y = 241.0f;
 	objects_shader1.rbegin()->init();
 
 	objects_shader1.push_back(Obj3D("models/skybox/model.obj", "models/skybox/texture.dds"));
 	objects_shader1.rbegin()->rotation.y = pi_over_2;
-	objects_shader1.rbegin()->scale = vec3(5.0f);
+	objects_shader1.rbegin()->scale = vec3(11.9f);
 	objects_shader1.rbegin()->depthTest = false;
 	objects_shader1.rbegin()->init();
 	
-	for (int i = 0; i <= 10; ++i) {
-		objects.push_back(Obj3D("models/rock/model1.obj", "models/rock/texture.dds", "models/rock/texture_normals.bmp"));
+	// Clouds
+	for (int i = 0; i <= 25; ++i) {
+		objects.push_back(Obj3D("models/rock/model1.obj", "models/rock/cloud.dds"));
 		objects.rbegin()->init();
 
-		objects.rbegin()->position = vec3(rand() % 10, rand() % 10, rand() % 10);	
-		objects.rbegin()->speed = vec3(rand() % 100 / 10000.f, rand() % 100 / 10000.f, rand() % 100 / 10000.f);
+		float size = 7.0f / ((rand() % 10) + 1);
+		objects.rbegin()->scale = vec3(size / (1 + rand()%2), 3.0f / ((rand() % 10) + 1), size / (1 + rand() % 2));
+		objects.rbegin()->position = vec3(-75 + rand() % 150, 75 - (rand() % 10), -75 + rand() % 150);
+		objects.rbegin()->speed = vec3(-4 + rand() % 8, 0, -4 + rand() % 8);
+		objects.rbegin()->speed.x /= 126;
+		objects.rbegin()->speed.z /= 126;
+	}
+	
+	// Rocks
+	for (int i = 0; i <= 50; ++i) {
+		objects.push_back(Obj3D("models/rock/model1.obj", "models/rock/texture.dds", "models/rock/texture_normals.bmp"));
+		objects.rbegin()->scale = vec3(1.0f / ((rand() % 10) + 1));
+		objects.rbegin()->position = vec3(-50 + rand() % 100, 0 - (1/ (0.001 + rand() % 5)), -50 + rand() % 100);
+		objects.rbegin()->rotation = vec3((rand() % 8)* pi_over_4, 0, 0);
+		objects.rbegin()->init();
 	}
 
+	// Deers
+	for (int i = 0; i <= 30; ++i) {
+		objects.push_back(Obj3D("models/deer/model.obj", "models/deer/texture.dds", "models/deer/texture_normals.bmp"));
+		objects.rbegin()->scale = vec3(0.1f);
+		objects.rbegin()->position = vec3(-50 + rand() % 100, 0, -50 + rand() % 100);
+		objects.rbegin()->rotation = vec3((rand() % 8)* pi_over_4, 0, 0);
+		objects.rbegin()->init();
+	}
+
+	// Houses
+	for (int i = 0; i <= 30; ++i) {
+		if (rand() % 2) {
+			objects.push_back(Obj3D("models/house2/model.obj", "models/house2/texture.dds", "models/house2/texture_normals.bmp"));
+		}
+		else {
+			objects.push_back(Obj3D("models/house2/model.obj", "models/house2/texture2.dds", "models/house2/texture_normals.bmp"));
+		}
+
+		objects.rbegin()->scale = vec3(0.2f);
+		objects.rbegin()->position = vec3(-152 + rand() % 313, -1, -151 + rand() % 317);
+		objects.rbegin()->rotation = vec3((rand() % 4)* pi_over_2, pi_over_2, 0);
+		objects.rbegin()->init();
+	}
+	
+	/*
 	objects.push_back(Obj3D("models/house1/model1.obj", "models/house1/texture.dds", "models/house1/texture_normals.bmp"));
-	objects.rbegin()->init();
+	objects.rbegin()->init();*/
 }
 
 void updateLoop() {
@@ -73,7 +113,7 @@ void updateLoop() {
 // Shader uniform identifiers
 GLuint MatrixID, ViewMatrixID, ModelMatrixID, LightID, TextureID, NormalTextureID, ModelView3x3MatrixID;
 GLuint programID, textureShaderID;
-GLuint MatrixID_2, TextureID_2;
+GLuint MatrixID_2, TextureID_2, BoolID;
 
 void drawLoop(vec3 lightPos) {
 	// Measure speed
@@ -111,6 +151,7 @@ void drawLoop(vec3 lightPos) {
 		}
 
 		glUniformMatrix4fv(MatrixID_2, 1, GL_FALSE, &MVP[0][0]);
+		glUniform1i(BoolID, (obj == objects_shader1.begin()) * 60);
 
 		// Bind our texture
 		glActiveTexture(GL_TEXTURE0);
@@ -285,6 +326,7 @@ int main(void)
 
 	MatrixID_2 = glGetUniformLocation(textureShaderID, "MVP");
 	TextureID_2 = glGetUniformLocation(textureShaderID, "myTextureSampler");
+	BoolID = glGetUniformLocation(textureShaderID, "scaleTexture");
 
 
 	vec3 lightPos(-25, 50, 25);
@@ -293,9 +335,9 @@ int main(void)
 	
 	lastTime = glfwGetTime();
 
-	srand(time((unsigned int)0));
+	srand((unsigned int)time(NULL));
 
-	vec2 dir(1);
+	vec3 dir(1);
 	do {
 		updateLoop();
 		
@@ -307,7 +349,9 @@ int main(void)
 		if (lightPos.x > 40.0f) lightPos.x = 40.0f, dir.x = -1;
 		if (lightPos.x < -40.0f) lightPos.x = -40.0f, dir.x = 1;
 		
-		objects[3].position = lightPos;
+		lightPos.z += 0.05f * dir.z;
+		if (lightPos.z > 40.0f) lightPos.z = 40.0f, dir.z = -1;
+		if (lightPos.z < -40.0f) lightPos.z = -40.0f, dir.z = 1;
 
 		drawLoop(lightPos);
 	}
